@@ -1,0 +1,110 @@
+﻿@model AccountPropertyModel
+@{
+    ViewData["Title"] = "Hesap";
+    Layout = "~/Views/Shared/_LayoutBackend.cshtml";
+}
+
+<div class="container-fluid">
+
+    <!-- Page Heading -->
+    <h1 class="h3 mb-2 text-gray-800">Hesap</h1>
+
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Hesap Ekle</h6>
+        </div>
+        <div class="card-body">
+            <form asp-action="Create" asp-controller="AccountProperty" method="post" role="form">
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="SystemTypeId">Sistem Tipi</label>
+                    <select class="select2 form-control" asp-for="SystemTypeId" asp-items="ViewBag.SystemTypeId">
+                        <option value="">Sistem Tipi Seçiniz</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label asp-for="PlatformId">Platform</label>
+                    <select class="select2 form-control" asp-for="PlatformId" asp-items="ViewBag.PlatformId">
+                        <option value="">Platform Seçiniz</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label asp-for="SafeId">Kasa</label>
+                    <select class="select2 form-control" asp-for="SafeId" asp-items="ViewBag.SafeId">
+                        <option value="">Kasa Seçiniz</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Address">Url</label>
+                    <input type="text" asp-for="Address" class="form-control" placeholder="Url Giriniz" required>
+                </div>
+                <div class="form-group">
+                    <label asp-for="UserName">Kullanıcı Adı</label>
+                    <input type="text" asp-for="UserName" class="form-control" placeholder="Kullanıcı Adı Giriniz" required>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Password">Şifre</label>
+                    <div class="form-inline">
+                        <input type="password" asp-for="Password" class="form-control" placeholder="Şifre Giriniz" required style="width:93%!important;">
+                        <button type="submit" class="btn btn-success" id="Generate" style="margin-left:5px;">Şifre Üret</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label asp-for="RePassword">Şifre Tekrar</label>
+                    <input type="password" asp-for="RePassword" class="form-control" placeholder="Şifre Tekrar Giriniz" required>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Comment">Tanım</label>
+                    <input type="text" asp-for="Comment" class="form-control" placeholder="Tanım Giriniz" required>
+                </div>
+                <div class="form-group form-check">
+                    <input type="checkbox" class="form-check-input" asp-for="Status">
+                    <label class="form-check-label" asp-for="Status">Aktif</label>
+                </div>
+                <button type="submit" class="btn btn-primary">Kaydet</button>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $("#SystemTypeId").change(function () {
+                $("#PlatformId").empty();
+                var systemTypeId = $('#SystemTypeId').val();
+                $.ajax({
+                    url: "@Url.Action("GetPlatforms","AccountProperty")",
+                    data: { id: systemTypeId },
+                    type: "POST",
+                    dataType: "Json",
+                    success: function (data) {
+                        //console.log(data);
+                        $("#PlatformId").append("<option value=''>Platform Seçiniz</option>");
+                        for (var i = 0; i < data.length; i++) {
+                            $("#PlatformId").append("<option value='" + data[i].value + "'>" + data[i].text + "</option>");
+                        }
+                    }
+                });
+            });
+
+            $("#Generate").click(function () {
+                $.ajax({ // ajax yazdım
+                    method: 'GET', // ve get methodunu kullandım.
+                    url: '/AccountProperty/PasswordGenerate' // buraya da api URL adresini yazdım.
+                }).done(function (response) { // işlem başarılı olursa bir response dönderdim. buraya ne dersiniz size kalmış
+                    //console.log(response);
+                    $("#Password").val(response);
+                    $("#RePassword").val(response);
+                }).fail(function () {
+                    alert('Hata Var') // eğer bir hata ile karşılaşırsam diye ekledim sile bilirsiniz.
+                });
+            });
+        });
+
+    </script>
+}

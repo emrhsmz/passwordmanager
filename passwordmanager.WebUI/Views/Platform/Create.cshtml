@@ -1,0 +1,39 @@
+﻿@model PlatformModel
+@{
+    ViewData["Title"] = "Sistem Tipi";
+    Layout = "~/Views/Shared/_LayoutBackend.cshtml";
+}
+
+<div class="container-fluid">
+
+    <!-- Page Heading -->
+    <h1 class="h3 mb-2 text-gray-800">Platformlar</h1>
+    
+   
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Platform Ekle</h6>
+        </div>
+        <div class="card-body">
+            <form asp-action="Create" asp-controller="Platform" method="post" role="form">
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="SystemTypeId">Sistem Tipi</label>
+                    <select class="select2 form-control" asp-for="SystemTypeId" asp-items="ViewBag.SystemTypeId">
+                        <option value="">Sistem Tipi Seçiniz</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Name">Platform Adı</label>
+                    <input type="text" asp-for="Name" class="form-control" placeholder="Platform Adı Giriniz" required>
+                </div>
+                <div class="form-group form-check">
+                    <input type="checkbox" class="form-check-input" asp-for="Status">
+                    <label class="form-check-label" asp-for="Status">Aktif</label>
+                </div>
+                <button type="submit" class="btn btn-primary">Kaydet</button>
+            </form>
+        </div>
+    </div>
+
+</div>

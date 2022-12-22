@@ -1,0 +1,13 @@
+﻿@model AccountPropertyModel
+
+@{
+    ViewBag.Title = Model.UserName + " Kullanıcısının Şifre Detayı";
+}
+
+<div class="alert alert-warning" role="alert">
+    @Model.UserName Kullanıcısının Şifre Detayı
+</div>
+
+<div class="form-group mb-2">
+    <input type="text" asp-for="Password" disabled class="form-control">
+</div>

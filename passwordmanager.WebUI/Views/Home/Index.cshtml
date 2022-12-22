@@ -1,0 +1,165 @@
+﻿@model AccountPropertyListModel
+@{
+    ViewData["Title"] = "Şifrelerim";
+    Layout = "~/Views/Shared/_LayoutBackend.cshtml";
+}
+
+<div class="container-fluid">
+
+    <!-- Page Heading -->
+    <h1 class="h3 mb-2 text-gray-800">Şifrelerim</h1>
+    <p class="mb-4">
+        <a asp-action="Create" asp-controller="AccountProperty" class="btn btn-success btn-icon-split">
+            <span class="icon text-white-50">
+                <i class="fas fa-check"></i>
+            </span>
+            <span class="text">Yeni Ekle</span>
+        </a>
+        <a asp-action="Index" asp-controller="Home" asp-route-filter="favorite" class="btn btn-warning btn-icon-split">
+            <span class="icon text-white-50">
+                <i class="fas fa-star"></i>
+            </span>
+            <span class="text">Favorilerim</span>
+        </a>
+        <a asp-action="Index" asp-controller="Home" asp-route-filter="passive" class="btn btn-danger btn-icon-split">
+            <span class="icon text-white-50">
+                <i class="fas fa-ban"></i>
+            </span>
+            <span class="text">Pasif Şifrelerim</span>
+        </a>
+    </p>
+
+    <!-- DataTales Example -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Şifrelerim</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th><i class="fa fa-star"></i></th>
+                            <th>Kullanıcı Adı</th>
+                            <th id="Password">Şifre</th>
+                            <th>Url</th>
+                            <th>Açıklama</th>
+                            <th>Hesap Adı</th>
+                            <th>Durum</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var accountProperty in Model.AccountProperties)
+                        {
+                            <tr>
+                                <td style="cursor:pointer;"><i class="fa fa-star @(accountProperty.isFavorite ? "text-warning" : "")" onclick="modelFavoriteAddRemoveChange(@accountProperty.Id)"></i></td>
+                                <td class="tableList" data-href="/AccountProperty/Edit/@accountProperty.Id" style="cursor:pointer;">@accountProperty.UserName</td>
+                                <td id="Password">@accountProperty.Password</td>
+                                <td>@accountProperty.Address</td>
+                                <td>@accountProperty.Comment</td>
+                                <td>@accountProperty.AccountName</td>
+                                <td><button onclick="modelStatusChange(@accountProperty.Id,@(accountProperty.Status == true ? "1" : "0"))" class="btn btn-@(accountProperty.Status ? "success" : "danger")">@(accountProperty.Status ? "Aktif" : "Pasif")</button></td>
+                                <td><button href="#" data-toggle="modal" class="btn btn-light modalDetail" data-target="@Url.Action("Modal","AccountProperty",new { id = @accountProperty.Id })" id="@accountProperty.Id">Şifre Göster</button></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body"></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Kapat</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script src="~/backend/js/sweet/sweetalert.min.js" asp-append-version="true"></script>
+    <script src="~/backend/js/demo/demo.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("body").on("click", ".modalDetail", function () {
+                var url = $(this).data("target");
+                $.post(url, function (data) { })
+                    .done(function (data) {
+                        $("#logoutModal .modal-body").html(data);
+                        $("#logoutModal").modal("show");
+                    })
+                    .fail(function () {
+                        $("#logoutModal .modal-body").text("Error!!");
+                        $("#logoutModal").modal("show");
+                    })
+            });
+        });
+        function modelStatusChange(id, status) {
+            var status1 = status;
+            if (status == 0) {
+                status1 = "true";
+            } else {
+                status1 = "false";
+            }
+            debugger;
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("StatusChange","AccountProperty")",
+                data: {
+                    id: id,
+                    status: status1
+                },
+                dataType: "json",
+                success: function (result) {
+                    if (result) {
+                        swal("Başarılı!", "İşlem başarıyla kaydedilmiştir.", "success");
+                        setTimeout(function () {
+                            location.reload(true);
+                        }, 2000);
+
+                    } else {
+                        swal("Hata!", "Sistemde bir hata oluştur", "error");
+                    }
+                },
+                error: function (err) {
+                    swal("Error!", err.responseText, "error");
+                }
+            });
+        };
+
+        function modelFavoriteAddRemoveChange(id) {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("AddRemoveFavorite","Favorite")",
+                data: {
+                    id: id
+                },
+                dataType: "json",
+                success: function (result) {
+                    if (result) {
+                        swal("Başarılı!", "İşlem başarıyla kaydedilmiştir.", "success");
+                        setTimeout(function () {
+                            location.reload(true);
+                        }, 2000);
+
+                    } else {
+                        swal("Hata!", "Sistemde bir hata oluştur", "error");
+                    }
+                },
+                error: function (err) {
+                    swal("Error!", err.responseText, "error");
+                }
+            });
+        };
+
+    </script>
+}
